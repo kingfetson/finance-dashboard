@@ -6,52 +6,75 @@
     <title>Personal Finance Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Theme Toggle -->
-    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <!-- Main Container -->
     <div class="dashboard-container">
-        <!-- Header -->
+        <!-- Header with Logo -->
         <header class="dashboard-header">
             <div class="header-left">
-                <h1>💰 Personal Finance Dashboard</h1>
-                <p class="subtitle">Track your income, expenses, and savings</p>
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Finance<span>Dash</span></h1>
+                        <p class="subtitle"><i class="fas fa-chart-line"></i> Track your income, expenses, and savings</p>
+                    </div>
+                </div>
             </div>
             <div class="header-right">
-                <span class="date-display" id="currentDate"></span>
-                <button id="addTransactionBtn" class="btn-primary">+ Add Transaction</button>
+                <span class="date-display" id="currentDate">
+                    <i class="far fa-calendar-alt"></i>
+                </span>
+                <button id="addTransactionBtn" class="btn-primary">
+                    <i class="fas fa-plus-circle"></i> Add Transaction
+                </button>
             </div>
         </header>
 
         <!-- Stats Cards -->
         <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">💳</div>
+                <div class="stat-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
                 <div class="stat-content">
-                    <p class="stat-label">Balance</p>
+                    <p class="stat-label"><i class="fas fa-arrow-right"></i> Balance</p>
                     <p class="stat-value" id="balance">$0.00</p>
                 </div>
             </div>
             <div class="stat-card stat-income">
-                <div class="stat-icon">📈</div>
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
                 <div class="stat-content">
-                    <p class="stat-label">Total Income</p>
+                    <p class="stat-label"><i class="fas fa-arrow-up"></i> Total Income</p>
                     <p class="stat-value" id="totalIncome">$0.00</p>
                 </div>
             </div>
             <div class="stat-card stat-expense">
-                <div class="stat-icon">📉</div>
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
                 <div class="stat-content">
-                    <p class="stat-label">Total Expenses</p>
+                    <p class="stat-label"><i class="fas fa-arrow-down"></i> Total Expenses</p>
                     <p class="stat-value" id="totalExpenses">$0.00</p>
                 </div>
             </div>
             <div class="stat-card stat-savings">
-                <div class="stat-icon">🏦</div>
+                <div class="stat-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
                 <div class="stat-content">
-                    <p class="stat-label">Savings</p>
+                    <p class="stat-label"><i class="fas fa-piggy-bank"></i> Savings</p>
                     <p class="stat-value" id="savings">$0.00</p>
                 </div>
             </div>
@@ -61,9 +84,9 @@
         <section class="charts-section">
             <div class="chart-card">
                 <div class="chart-header">
-                    <h3>Monthly Overview</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Monthly Overview</h3>
                     <select id="monthSelect" class="month-select">
-                        <option value="0">January</option>
+                        <option value="0"><i class="fas fa-calendar"></i> January</option>
                         <option value="1">February</option>
                         <option value="2">March</option>
                         <option value="3">April</option>
@@ -84,7 +107,7 @@
 
             <div class="chart-card">
                 <div class="chart-header">
-                    <h3>Spending by Category</h3>
+                    <h3><i class="fas fa-pie-chart"></i> Spending by Category</h3>
                 </div>
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
@@ -95,13 +118,16 @@
         <!-- Transactions Section -->
         <section class="transactions-section">
             <div class="transactions-header">
-                <h3>Recent Transactions</h3>
+                <h3><i class="fas fa-list-ul"></i> Recent Transactions</h3>
                 <div class="filter-group">
-                    <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input">
+                    </div>
                     <select id="filterType" class="filter-select">
-                        <option value="all">All</option>
-                        <option value="income">Income</option>
-                        <option value="expense">Expenses</option>
+                        <option value="all"><i class="fas fa-filter"></i> All</option>
+                        <option value="income"><i class="fas fa-arrow-up"></i> Income</option>
+                        <option value="expense"><i class="fas fa-arrow-down"></i> Expenses</option>
                     </select>
                 </div>
             </div>
@@ -109,12 +135,12 @@
                 <table id="transactionsTable">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Actions</th>
+                            <th><i class="far fa-calendar-alt"></i> Date</th>
+                            <th><i class="fas fa-tag"></i> Description</th>
+                            <th><i class="fas fa-folder"></i> Category</th>
+                            <th><i class="fas fa-info-circle"></i> Type</th>
+                            <th><i class="fas fa-dollar-sign"></i> Amount</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
                         </tr>
                     </thead>
                     <tbody id="transactionsBody">
@@ -129,20 +155,20 @@
     <div id="transactionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Add Transaction</h2>
+                <h2 id="modalTitle"><i class="fas fa-plus-circle"></i> Add Transaction</h2>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
             <form id="transactionForm">
                 <div class="form-group">
-                    <label for="description">Description</label>
+                    <label for="description"><i class="fas fa-tag"></i> Description</label>
                     <input type="text" id="description" placeholder="e.g., Grocery Shopping" required>
                 </div>
                 <div class="form-group">
-                    <label for="amount">Amount</label>
+                    <label for="amount"><i class="fas fa-dollar-sign"></i> Amount</label>
                     <input type="number" id="amount" placeholder="0.00" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="category">Category</label>
+                    <label for="category"><i class="fas fa-folder"></i> Category</label>
                     <select id="category" required>
                         <optgroup label="Expenses">
                             <option value="Food">🍕 Food</option>
@@ -167,25 +193,34 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="transactionDate">Date</label>
+                    <label for="transactionDate"><i class="far fa-calendar-alt"></i> Date</label>
                     <input type="date" id="transactionDate" required>
                 </div>
                 <div class="form-group">
-                    <label>Type</label>
+                    <label><i class="fas fa-exchange-alt"></i> Type</label>
                     <div class="type-toggle">
-                        <button type="button" id="typeExpense" class="type-btn active" data-type="expense">Expense</button>
-                        <button type="button" id="typeIncome" class="type-btn" data-type="income">Income</button>
+                        <button type="button" id="typeExpense" class="type-btn active" data-type="expense">
+                            <i class="fas fa-arrow-down"></i> Expense
+                        </button>
+                        <button type="button" id="typeIncome" class="type-btn" data-type="income">
+                            <i class="fas fa-arrow-up"></i> Income
+                        </button>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary submit-btn">Add Transaction</button>
+                <button type="submit" class="btn-primary submit-btn">
+                    <i class="fas fa-save"></i> <span id="submitBtnText">Add Transaction</span>
+                </button>
             </form>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
 
-    <!-- IMPORTANT: Load scripts in correct order -->
+    <!-- Scripts -->
     <script src="js/data.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/app.js"></script>
