@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>💰 Personal Finance Dashboard</h1>
+                <p class="subtitle">Track your income, expenses, and savings</p>
+            </div>
+            <div class="header-right">
+                <span class="date-display" id="currentDate"></span>
+                <button id="addTransactionBtn" class="btn-primary">+ Add Transaction</button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💳</div>
+                <div class="stat-content">
+                    <p class="stat-label">Balance</p>
+                    <p class="stat-value" id="balance">$0.00</p>
+                </div>
+            </div>
+            <div class="stat-card stat-income">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                    <p class="stat-label">Total Income</p>
+                    <p class="stat-value" id="totalIncome">$0.00</p>
+                </div>
+            </div>
+            <div class="stat-card stat-expense">
+                <div class="stat-icon">📉</div>
+                <div class="stat-content">
+                    <p class="stat-label">Total Expenses</p>
+                    <p class="stat-value" id="totalExpenses">$0.00</p>
+                </div>
+            </div>
+            <div class="stat-card stat-savings">
+                <div class="stat-icon">🏦</div>
+                <div class="stat-content">
+                    <p class="stat-label">Savings</p>
+                    <p class="stat-value" id="savings">$0.00</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Monthly Overview</h3>
+                    <select id="monthSelect" class="month-select">
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Spending by Category</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <h3>Recent Transactions</h3>
+                <div class="filter-group">
+                    <input type="text" id="searchInput" placeholder="Search transactions..." class="search-input">
+                    <select id="filterType" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expenses</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be rendered here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Transaction</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="transactionForm">
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" placeholder="e.g., Grocery Shopping" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" required>
+                        <optgroup label="Expenses">
+                            <option value="Food">🍕 Food</option>
+                            <option value="Transportation">🚗 Transportation</option>
+                            <option value="Shopping">🛍️ Shopping</option>
+                            <option value="Entertainment">🎬 Entertainment</option>
+                            <option value="Utilities">💡 Utilities</option>
+                            <option value="Healthcare">🏥 Healthcare</option>
+                            <option value="Housing">🏠 Housing</option>
+                            <option value="Education">📚 Education</option>
+                            <option value="Personal">💇 Personal</option>
+                            <option value="Other">📝 Other</option>
+                        </optgroup>
+                        <optgroup label="Income">
+                            <option value="Salary">💼 Salary</option>
+                            <option value="Freelance">💻 Freelance</option>
+                            <option value="Investment">📈 Investment</option>
+                            <option value="Gift">🎁 Gift</option>
+                            <option value="Refund">🔄 Refund</option>
+                            <option value="Other Income">💰 Other</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transactionDate">Date</label>
+                    <input type="date" id="transactionDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="transactionType">Type</label>
+                    <div class="type-toggle">
+                        <button type="button" id="typeExpense" class="type-btn active">Expense</button>
+                        <button type="button" id="typeIncome" class="type-btn">Income</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary submit-btn">Add Transaction</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
