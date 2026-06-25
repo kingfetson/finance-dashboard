@@ -40,6 +40,15 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
     
+    // Check if FinanceDB exists
+    if (typeof FinanceDB === 'undefined') {
+        ctx.fillStyle = colors.text;
+        ctx.font = '16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Loading data...', width / 2, height / 2);
+        return;
+    }
+    
     // Get data for current month and previous 2 months
     const months = [];
     const incomeData = [];
@@ -53,6 +62,16 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         months.push(monthNames[m]);
         incomeData.push(summary.totalIncome);
         expenseData.push(summary.totalExpenses);
+    }
+    
+    // Check if there's any data
+    const hasData = incomeData.some(v => v > 0) || expenseData.some(v => v > 0);
+    if (!hasData) {
+        ctx.fillStyle = colors.text;
+        ctx.font = '16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available for this period', width / 2, height / 2);
+        return;
     }
     
     // Calculate Y-axis scale
@@ -80,40 +99,42 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     const barWidth = Math.min(50, chartWidth / 3 / 2.5);
     const gap = chartWidth / 3;
     
-    months.forEach((month, index) => {
+    months.forEach((monthName, index) => {
         const x = padding.left + index * gap + (gap - barWidth * 2) / 2;
         
         // Income bar
         const incomeHeight = (incomeData[index] / yMax) * chartHeight;
         const yIncome = padding.top + chartHeight - incomeHeight;
-        ctx.fillStyle = colors.income;
-        ctx.fillRect(x, yIncome, barWidth, incomeHeight);
+        if (incomeData[index] > 0) {
+            ctx.fillStyle = colors.income;
+            ctx.fillRect(x, yIncome, barWidth, incomeHeight);
+            
+            // Income amount label
+            ctx.fillStyle = colors.income;
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + incomeData[index].toLocaleString(), x + barWidth / 2, yIncome - 6);
+        }
         
         // Expense bar
         const expenseHeight = (expenseData[index] / yMax) * chartHeight;
         const yExpense = padding.top + chartHeight - expenseHeight;
-        ctx.fillStyle = colors.expense;
-        ctx.fillRect(x + barWidth + 4, yExpense, barWidth, expenseHeight);
+        if (expenseData[index] > 0) {
+            ctx.fillStyle = colors.expense;
+            ctx.fillRect(x + barWidth + 4, yExpense, barWidth, expenseHeight);
+            
+            // Expense amount label
+            ctx.fillStyle = colors.expense;
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + expenseData[index].toLocaleString(), x + barWidth + 4 + barWidth / 2, yExpense - 6);
+        }
         
         // Month label
         ctx.fillStyle = colors.text;
         ctx.font = '12px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(month, x + barWidth + 2, padding.top + chartHeight + 20);
-        
-        // Income amount label
-        if (incomeData[index] > 0) {
-            ctx.fillStyle = colors.income;
-            ctx.font = '10px Inter, sans-serif';
-            ctx.fillText('$' + incomeData[index].toLocaleString(), x + barWidth / 2, yIncome - 6);
-        }
-        
-        // Expense amount label
-        if (expenseData[index] > 0) {
-            ctx.fillStyle = colors.expense;
-            ctx.font = '10px Inter, sans-serif';
-            ctx.fillText('$' + expenseData[index].toLocaleString(), x + barWidth + 4 + barWidth / 2, yExpense - 6);
-        }
+        ctx.fillText(monthName, x + barWidth + 2, padding.top + chartHeight + 20);
     });
     
     // Draw legend
@@ -155,6 +176,15 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     const centerX = width / 2;
     const centerY = height / 2 - 10;
     const radius = Math.min(width, height) / 2 - 40;
+    
+    // Check if FinanceDB exists
+    if (typeof FinanceDB === 'undefined') {
+        ctx.fillStyle = colors.text;
+        ctx.font = '16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Loading data...', centerX, centerY);
+        return;
+    }
     
     // Get category data
     const breakdown = FinanceDB.getCategoryBreakdown(month, year);
@@ -252,7 +282,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
 // Update both charts
 function updateCharts() {
     const monthSelect = document.getElementById('monthSelect');
-    const month = parseInt(monthSelect.value);
+    const month = parseInt(monthSelect.value) || new Date().getMonth();
     const year = new Date().getFullYear();
     
     drawMonthlyChart(month, year);
@@ -270,7 +300,17 @@ function handleChartResize() {
 
 // Initialize charts when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(updateCharts, 200);
+    setTimeout(updateCharts, 300);
     window.addEventListener('resize', handleChartResize);
-    document.getElementById('monthSelect')?.addEventListener('change', updateCharts);
+    
+    const monthSelect = document.getElementById('monthSelect');
+    if (monthSelect) {
+        monthSelect.addEventListener('change', updateCharts);
+    }
 });
+
+// Re-run charts when transactions update
+// This will be called from app.js after transactions change
+window.forceChartUpdate = function() {
+    setTimeout(updateCharts, 100);
+};
