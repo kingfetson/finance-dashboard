@@ -1,4 +1,6 @@
-// ===== Chart Drawing Functions =====
+// ============================================
+// CHART DRAWING FUNCTIONS
+// ============================================
 
 // Helper to get theme colors
 function getThemeColors() {
@@ -23,6 +25,7 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     const width = rect.width || 400;
     const height = 280;
     
+    // Set canvas size with device pixel ratio
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = width + 'px';
@@ -34,7 +37,7 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
     
-    // Clear
+    // Clear canvas
     ctx.clearRect(0, 0, width, height);
     
     // Get data for current month and previous 2 months
@@ -52,6 +55,7 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         expenseData.push(summary.totalExpenses);
     }
     
+    // Calculate Y-axis scale
     const maxValue = Math.max(...incomeData, ...expenseData, 100);
     const yStep = Math.ceil(maxValue / 5 / 100) * 100;
     const yMax = yStep * 5;
@@ -97,14 +101,14 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         ctx.textAlign = 'center';
         ctx.fillText(month, x + barWidth + 2, padding.top + chartHeight + 20);
         
-        // Income amount
+        // Income amount label
         if (incomeData[index] > 0) {
             ctx.fillStyle = colors.income;
             ctx.font = '10px Inter, sans-serif';
             ctx.fillText('$' + incomeData[index].toLocaleString(), x + barWidth / 2, yIncome - 6);
         }
         
-        // Expense amount
+        // Expense amount label
         if (expenseData[index] > 0) {
             ctx.fillStyle = colors.expense;
             ctx.font = '10px Inter, sans-serif';
@@ -112,7 +116,7 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         }
     });
     
-    // Legend
+    // Draw legend
     const legendX = padding.left + chartWidth - 140;
     const legendY = padding.top + 10;
     
@@ -140,6 +144,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     const width = rect.width || 400;
     const height = 280;
     
+    // Set canvas size with device pixel ratio
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = width + 'px';
@@ -157,6 +162,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     const values = Object.values(breakdown);
     const total = values.reduce((sum, v) => sum + v, 0);
     
+    // Show message if no data
     if (total === 0) {
         ctx.fillStyle = colors.text;
         ctx.font = '16px Inter, sans-serif';
@@ -171,7 +177,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         '#14B8A6', '#F43F5E', '#8B5CF6', '#EAB308', '#22D3EE'
     ];
     
-    // Draw doughnut
+    // Draw doughnut chart
     let startAngle = -Math.PI / 2;
     const sliceSpacing = 0.02;
     
@@ -188,7 +194,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         ctx.fillStyle = categoryColors[index % categoryColors.length];
         ctx.fill();
         
-        // Draw percentage text for large slices
+        // Draw percentage label for larger slices
         if (percentage > 0.08) {
             const midAngle = startAngle + sliceAngle / 2;
             const textRadius = radius * 0.65;
@@ -222,7 +228,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     ctx.font = 'bold 22px Inter, sans-serif';
     ctx.fillText('$' + total.toLocaleString(), centerX, centerY + 20);
     
-    // Legend
+    // Draw legend
     const legendItems = categories.slice(0, 6);
     const legendY = height - 20;
     const itemWidth = 120;
@@ -243,7 +249,7 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     });
 }
 
-// Chart update function
+// Update both charts
 function updateCharts() {
     const monthSelect = document.getElementById('monthSelect');
     const month = parseInt(monthSelect.value);
@@ -253,18 +259,18 @@ function updateCharts() {
     drawCategoryChart(month, year);
 }
 
-// Resize handler
+// Handle window resize
 let resizeTimeout;
-function handleResize() {
+function handleChartResize() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
         updateCharts();
     }, 250);
 }
 
-// Initialize charts
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(updateCharts, 100);
-    window.addEventListener('resize', handleResize);
+// Initialize charts when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(updateCharts, 200);
+    window.addEventListener('resize', handleChartResize);
     document.getElementById('monthSelect')?.addEventListener('change', updateCharts);
 });
