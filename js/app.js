@@ -44,7 +44,9 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     elements.themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    updateCharts();
+    if (typeof updateCharts === 'function') {
+        setTimeout(updateCharts, 100);
+    }
 }
 
 function loadTheme() {
@@ -103,6 +105,11 @@ function updateDashboard() {
     elements.savings.textContent = formatCurrency(summary.balance);
     
     renderTransactions();
+    
+    // Update charts after data changes
+    if (typeof updateCharts === 'function') {
+        setTimeout(updateCharts, 100);
+    }
 }
 
 
@@ -163,7 +170,6 @@ window.deleteTransaction = function(id) {
     if (confirm('Are you sure you want to delete this transaction?')) {
         FinanceDB.deleteTransaction(id);
         updateDashboard();
-        updateCharts();
         showToast('Transaction deleted successfully', 'error');
     }
 };
@@ -254,7 +260,6 @@ function handleFormSubmit(e) {
     
     closeModal();
     updateDashboard();
-    updateCharts();
 }
 
 
@@ -323,6 +328,5 @@ document.addEventListener('keydown', (e) => {
 // Expose functions globally for inline onclick handlers
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.updateCharts = updateCharts;
 window.toggleTheme = toggleTheme;
 window.deleteTransaction = window.deleteTransaction;
