@@ -25,7 +25,6 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     const width = rect.width || 400;
     const height = 280;
     
-    // Set canvas size with device pixel ratio
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = width + 'px';
@@ -37,19 +36,9 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
     
-    // Clear canvas
     ctx.clearRect(0, 0, width, height);
     
-    // Check if FinanceDB exists
-    if (typeof FinanceDB === 'undefined') {
-        ctx.fillStyle = colors.text;
-        ctx.font = '16px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Loading data...', width / 2, height / 2);
-        return;
-    }
-    
-    // Get data for current month and previous 2 months
+    // Get data
     const months = [];
     const incomeData = [];
     const expenseData = [];
@@ -64,7 +53,6 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         expenseData.push(summary.totalExpenses);
     }
     
-    // Check if there's any data
     const hasData = incomeData.some(v => v > 0) || expenseData.some(v => v > 0);
     if (!hasData) {
         ctx.fillStyle = colors.text;
@@ -74,12 +62,11 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
         return;
     }
     
-    // Calculate Y-axis scale
     const maxValue = Math.max(...incomeData, ...expenseData, 100);
     const yStep = Math.ceil(maxValue / 5 / 100) * 100;
     const yMax = yStep * 5;
     
-    // Draw grid lines
+    // Draw grid
     ctx.strokeStyle = colors.grid;
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 5; i++) {
@@ -102,42 +89,37 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     months.forEach((monthName, index) => {
         const x = padding.left + index * gap + (gap - barWidth * 2) / 2;
         
-        // Income bar
         const incomeHeight = (incomeData[index] / yMax) * chartHeight;
         const yIncome = padding.top + chartHeight - incomeHeight;
         if (incomeData[index] > 0) {
             ctx.fillStyle = colors.income;
             ctx.fillRect(x, yIncome, barWidth, incomeHeight);
             
-            // Income amount label
             ctx.fillStyle = colors.income;
             ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('$' + incomeData[index].toLocaleString(), x + barWidth / 2, yIncome - 6);
         }
         
-        // Expense bar
         const expenseHeight = (expenseData[index] / yMax) * chartHeight;
         const yExpense = padding.top + chartHeight - expenseHeight;
         if (expenseData[index] > 0) {
             ctx.fillStyle = colors.expense;
             ctx.fillRect(x + barWidth + 4, yExpense, barWidth, expenseHeight);
             
-            // Expense amount label
             ctx.fillStyle = colors.expense;
             ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('$' + expenseData[index].toLocaleString(), x + barWidth + 4 + barWidth / 2, yExpense - 6);
         }
         
-        // Month label
         ctx.fillStyle = colors.text;
         ctx.font = '12px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(monthName, x + barWidth + 2, padding.top + chartHeight + 20);
     });
     
-    // Draw legend
+    // Legend
     const legendX = padding.left + chartWidth - 140;
     const legendY = padding.top + 10;
     
@@ -154,7 +136,7 @@ function drawMonthlyChart(month = new Date().getMonth(), year = new Date().getFu
     ctx.fillText('Expenses', legendX + 100, legendY + 10);
 }
 
-// Draw Category Chart (Doughnut Chart)
+// Draw Category Chart
 function drawCategoryChart(month = new Date().getMonth(), year = new Date().getFullYear()) {
     const canvas = document.getElementById('categoryChart');
     if (!canvas) return;
@@ -165,7 +147,6 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     const width = rect.width || 400;
     const height = 280;
     
-    // Set canvas size with device pixel ratio
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = width + 'px';
@@ -177,22 +158,11 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     const centerY = height / 2 - 10;
     const radius = Math.min(width, height) / 2 - 40;
     
-    // Check if FinanceDB exists
-    if (typeof FinanceDB === 'undefined') {
-        ctx.fillStyle = colors.text;
-        ctx.font = '16px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Loading data...', centerX, centerY);
-        return;
-    }
-    
-    // Get category data
     const breakdown = FinanceDB.getCategoryBreakdown(month, year);
     const categories = Object.keys(breakdown);
     const values = Object.values(breakdown);
     const total = values.reduce((sum, v) => sum + v, 0);
     
-    // Show message if no data
     if (total === 0) {
         ctx.fillStyle = colors.text;
         ctx.font = '16px Inter, sans-serif';
@@ -207,7 +177,6 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         '#14B8A6', '#F43F5E', '#8B5CF6', '#EAB308', '#22D3EE'
     ];
     
-    // Draw doughnut chart
     let startAngle = -Math.PI / 2;
     const sliceSpacing = 0.02;
     
@@ -216,7 +185,6 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         const sliceAngle = (percentage - sliceSpacing / values.length) * 2 * Math.PI;
         const endAngle = startAngle + sliceAngle;
         
-        // Draw slice
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -224,7 +192,6 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         ctx.fillStyle = categoryColors[index % categoryColors.length];
         ctx.fill();
         
-        // Draw percentage label for larger slices
         if (percentage > 0.08) {
             const midAngle = startAngle + sliceAngle / 2;
             const textRadius = radius * 0.65;
@@ -241,13 +208,12 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
         startAngle = endAngle + (sliceSpacing / values.length) * 2 * Math.PI;
     });
     
-    // Draw center hole
+    // Center hole
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius * 0.5, 0, 2 * Math.PI);
     ctx.fillStyle = 'var(--bg-card)';
     ctx.fill();
     
-    // Center text
     ctx.fillStyle = colors.text;
     ctx.font = 'bold 18px Inter, sans-serif';
     ctx.textAlign = 'center';
@@ -257,26 +223,6 @@ function drawCategoryChart(month = new Date().getMonth(), year = new Date().getF
     ctx.fillStyle = colors.primary;
     ctx.font = 'bold 22px Inter, sans-serif';
     ctx.fillText('$' + total.toLocaleString(), centerX, centerY + 20);
-    
-    // Draw legend
-    const legendItems = categories.slice(0, 6);
-    const legendY = height - 20;
-    const itemWidth = 120;
-    const totalWidth = Math.min(legendItems.length * itemWidth, width - 40);
-    const startX = (width - totalWidth) / 2;
-    
-    legendItems.forEach((category, index) => {
-        const x = startX + index * itemWidth;
-        
-        ctx.fillStyle = categoryColors[index % categoryColors.length];
-        ctx.fillRect(x, legendY - 10, 12, 12);
-        
-        ctx.fillStyle = colors.text;
-        ctx.font = '10px Inter, sans-serif';
-        ctx.textAlign = 'left';
-        const label = category.length > 12 ? category.substring(0, 10) + '...' : category;
-        ctx.fillText(label, x + 16, legendY + 1);
-    });
 }
 
 // Update both charts
@@ -289,28 +235,20 @@ function updateCharts() {
     drawCategoryChart(month, year);
 }
 
-// Handle window resize
-let resizeTimeout;
-function handleChartResize() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        updateCharts();
-    }, 250);
-}
-
-// Initialize charts when DOM is ready
+// Initialize charts
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updateCharts, 300);
-    window.addEventListener('resize', handleChartResize);
     
     const monthSelect = document.getElementById('monthSelect');
     if (monthSelect) {
         monthSelect.addEventListener('change', updateCharts);
     }
+    
+    window.addEventListener('resize', function() {
+        clearTimeout(window._resizeTimeout);
+        window._resizeTimeout = setTimeout(updateCharts, 250);
+    });
 });
 
-// Re-run charts when transactions update
-// This will be called from app.js after transactions change
-window.forceChartUpdate = function() {
-    setTimeout(updateCharts, 100);
-};
+// Expose for app.js
+window.updateCharts = updateCharts;
