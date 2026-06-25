@@ -1,4 +1,6 @@
-// ===== Application Logic =====
+// ============================================
+// MAIN APPLICATION LOGIC
+// ============================================
 
 // DOM Elements
 const elements = {
@@ -31,7 +33,11 @@ const elements = {
 let currentTransactionType = 'expense';
 let editingId = null;
 
-// ===== Theme Management =====
+
+// ============================================
+// THEME MANAGEMENT
+// ============================================
+
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -47,7 +53,11 @@ function loadTheme() {
     elements.themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 }
 
-// ===== Toast Notifications =====
+
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
+
 function showToast(message, type = 'success') {
     const toast = elements.toast;
     toast.textContent = message;
@@ -56,7 +66,11 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ===== Formatting Helpers =====
+
+// ============================================
+// FORMATTING HELPERS
+// ============================================
+
 function formatCurrency(amount) {
     return '$' + amount.toLocaleString('en-US', {
         minimumFractionDigits: 2,
@@ -72,7 +86,11 @@ function formatDate(date) {
     });
 }
 
-// ===== Update Dashboard =====
+
+// ============================================
+// UPDATE DASHBOARD
+// ============================================
+
 function updateDashboard() {
     const month = new Date().getMonth();
     const year = new Date().getFullYear();
@@ -87,7 +105,11 @@ function updateDashboard() {
     renderTransactions();
 }
 
-// ===== Render Transactions =====
+
+// ============================================
+// RENDER TRANSACTIONS
+// ============================================
+
 function renderTransactions() {
     const searchTerm = elements.searchInput.value.toLowerCase();
     const filterType = elements.filterType.value;
@@ -101,7 +123,6 @@ function renderTransactions() {
         );
     }
     
-    // Sort by date (newest first)
     transactions.sort((a, b) => b.date - a.date);
     
     const tbody = elements.transactionsBody;
@@ -133,15 +154,19 @@ function renderTransactions() {
     `).join('');
 }
 
-// ===== Transaction CRUD =====
-function deleteTransaction(id) {
+
+// ============================================
+// TRANSACTION CRUD
+// ============================================
+
+window.deleteTransaction = function(id) {
     if (confirm('Are you sure you want to delete this transaction?')) {
         FinanceDB.deleteTransaction(id);
         updateDashboard();
         updateCharts();
         showToast('Transaction deleted successfully', 'error');
     }
-}
+};
 
 function openModal(transaction = null) {
     const modal = elements.transactionModal;
@@ -184,7 +209,11 @@ function updateTypeButtons(type) {
     elements.typeIncome.dataset.type = 'income';
 }
 
-// ===== Form Submission =====
+
+// ============================================
+// FORM SUBMISSION
+// ============================================
+
 function handleFormSubmit(e) {
     e.preventDefault();
     
@@ -212,7 +241,6 @@ function handleFormSubmit(e) {
     };
     
     if (editingId) {
-        // Update existing transaction
         const index = FinanceDB.transactions.findIndex(t => t.id === editingId);
         if (index !== -1) {
             FinanceDB.transactions[index] = { ...transaction, id: editingId };
@@ -220,7 +248,6 @@ function handleFormSubmit(e) {
             showToast('Transaction updated successfully', 'success');
         }
     } else {
-        // Add new transaction
         FinanceDB.addTransaction(transaction);
         showToast('Transaction added successfully', 'success');
     }
@@ -230,7 +257,11 @@ function handleFormSubmit(e) {
     updateCharts();
 }
 
-// ===== Event Listeners =====
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
 document.addEventListener('DOMContentLoaded', () => {
     // Set current date
     elements.currentDate.textContent = new Date().toLocaleDateString('en-US', {
@@ -248,10 +279,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Update dashboard
     updateDashboard();
-    
-    // Initial chart render
-    setTimeout(updateCharts, 200);
 });
+
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
 
 // Theme toggle
 elements.themeToggle.addEventListener('click', toggleTheme);
@@ -261,6 +294,8 @@ elements.addTransactionBtn.addEventListener('click', () => openModal());
 
 // Close modal
 elements.closeModal.addEventListener('click', closeModal);
+
+// Click outside modal to close
 elements.transactionModal.addEventListener('click', (e) => {
     if (e.target === elements.transactionModal) closeModal();
 });
@@ -276,9 +311,6 @@ elements.typeIncome.addEventListener('click', () => updateTypeButtons('income'))
 elements.searchInput.addEventListener('input', renderTransactions);
 elements.filterType.addEventListener('change', renderTransactions);
 
-// Month select for charts
-elements.monthSelect.addEventListener('change', updateCharts);
-
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
@@ -288,8 +320,9 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Expose functions globally
-window.deleteTransaction = deleteTransaction;
+// Expose functions globally for inline onclick handlers
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.updateCharts = updateCharts;
+window.toggleTheme = toggleTheme;
+window.deleteTransaction = window.deleteTransaction;
